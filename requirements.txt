@@ -1,4 +1,14 @@
-fastapi
-uvicorn
-gunicorn
+flask
 python-dotenv
+requests
+pyngrok
+line-bot-sdk
+langchain
+langchain-community
+langchain-huggingface
+google-generativeai
+faiss-cpu
+pillow
+gunicorn
+uvicorn
+fastapi
