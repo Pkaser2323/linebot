@@ -27,9 +27,11 @@ project/
 ## 技術堆疊 🛠
 
 - **後端框架**：Flask
-- **AI 模型**：
+- **AI 模型與框架**：
   - Google Gemini 1.5 Flash (圖像識別)
   - DMetaSoul/sbert-chinese-general-v2 (文本嵌入)
+  - Hugging Face Transformers (自然語言處理)
+  - LangChain (AI 應用框架)
 - **資料庫**：
   - FAISS 向量資料庫
   - FatSecret 營養資料庫
@@ -48,6 +50,7 @@ pip install -r requirements.txt
 GOOGLE_API_KEY=your_google_api_key
 LINE_ACCESS_TOKEN=your_line_access_token
 LINE_SECRET=your_line_secret
+HUGGINGFACE_API_KEY=your_huggingface_api_key
 ```
 
 3. 啟動服務：
@@ -81,17 +84,3 @@ python rag/chatbot.py
    - 糖尿病飲食建議
 4. 點選「查看詳細營養資訊」獲取更多資訊
 
-## 注意事項 ⚠️
-
-- 系統提供的營養資訊僅供參考
-- 若無法從資料庫取得資料，系統會使用 AI 估算
-- 建議搭配醫師或營養師的專業建議使用
-
-## 開發團隊 👥
-
-- 專案開發：[您的名字/團隊]
-- 聯絡信箱：[電子郵件]
-
-## 授權條款 📄
-
-本專案採用 MIT 授權條款 - 詳見 [LICENSE](LICENSE) 文件 
