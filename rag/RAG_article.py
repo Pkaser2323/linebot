@@ -35,26 +35,46 @@ model = genai.GenerativeModel(
 
 
 def generate_retriever():
-    print("Loading vector DB...")
+    print("載入向量資料庫...")
     model_kwargs = {"device": "cuda"}
     embedding = HuggingFaceEmbeddings(model_name=EMBED_MODEL_NAME, model_kwargs=model_kwargs)
     db = FAISS.load_local("vector_DB/diabetic_vector_db", embedding, allow_dangerous_deserialization=True)
-    print("Done loading vector DB!\n")
+    print("向量資料庫載入完成！\n")
+    # 移除 score_threshold，增加檢索數量
     return db.as_retriever(search_kwargs={"k": 5})
 
 
 def search_related_content(retriever, query):
     docs = retriever.invoke(query)
-    return "\n---\n".join([doc.page_content for doc in docs])
+    # 根據相關性排序文檔，但不過濾
+    sorted_docs = sorted(docs, key=lambda x: x.metadata.get("score", 0), reverse=True)
+    return "\n---\n".join([doc.page_content for doc in sorted_docs])
 
 
 def generate_answer(query, related_context, tokens):
     template = f"""
 任務: 
-1. 你是一位在台灣的糖尿病領域的專業護理師，需要以親切的口吻回答病患的問題。
-2. 你必須依照下方的「相關文本」，再透過同義的改寫生成出最後的答案。
-3. 輸出限制： 最多60字、只能使用繁體中文、純文字格式
-4. 如果「相關文本」中有答案，一定要引用「相關文本」來回答；如果判斷與「病患的提問」沒有關連只要回答「不好意思，我不清楚。」即可。
+1. 你是一位在台灣的糖尿病領域的專業護理師，需要以專業且嚴謹的態度回答病患的問題。
+
+2. 請仔細分析下方的「相關文本」，並按照以下步驟回答：
+   a. 從「相關文本」中提取可靠且相關的醫療資訊
+   b. 確保所提供的每一項建議都有文獻依據
+   c. 整合資訊時，需明確區分：
+      - 確定的醫療建議（有明確依據）
+      - 一般性建議（基於專業知識）
+   d. 使用準確的醫療術語，並提供清晰的解釋
+
+3. 回答要求：
+   - 字數限制：最多60字
+   - 使用繁體中文
+   - 分段呈現，重要醫療建議需加粗標記
+   - 若提供數據，必須註明是否來自相關文本
+
+4. 回答限制：
+   - 如果相關文本中沒有足夠的專業依據，必須明確告知：「這個問題需要更多專業資訊才能完整回答，建議您諮詢主治醫師」
+   - 不進行推測性回答
+   - 對於可能影響病患安全的建議，必須提醒諮詢醫療人員
+
 ------
 「相關文本」：
 {related_context}
